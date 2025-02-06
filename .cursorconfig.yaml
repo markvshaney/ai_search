@@ -1,0 +1,16 @@
+terminal:
+  init: |
+    try {
+      # First set execution policy to allow script running
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force;
+      Set-Location $env:WORKSPACE_FOLDER;
+      if (Test-Path "./venv/Scripts/Activate.ps1") {
+        # Actually activate the virtual environment when found
+        & "./venv/Scripts/Activate.ps1"
+      } else {
+        Write-Host "Virtual environment not found at: ./venv" -ForegroundColor Red
+        Write-Host "You can create it using: python -m venv venv" -ForegroundColor Yellow
+      }
+    } catch {
+      Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+    }

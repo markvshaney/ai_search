@@ -1,16 +1,40 @@
 terminal:
   init: |
     try {
-      # First set execution policy to allow script running
-      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force;
-      Set-Location $env:WORKSPACE_FOLDER;
-      if (Test-Path "./venv/Scripts/Activate.ps1") {
-        # Actually activate the virtual environment when found
-        & "./venv/Scripts/Activate.ps1"
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+      Set-Location $env:WORKSPACE_FOLDER
+      
+      # Define virtual environment path
+      $venvPath = "./venv/Scripts/Activate.ps1"
+      
+      if (Test-Path $venvPath) {
+        Write-Host "Activating virtual environment..." -ForegroundColor Green
+        & $venvPath
+        Write-Host "Virtual environment activated successfully!" -ForegroundColor Green
       } else {
         Write-Host "Virtual environment not found at: ./venv" -ForegroundColor Red
         Write-Host "You can create it using: python -m venv venv" -ForegroundColor Yellow
+        Write-Host "Then install requirements: pip install -r requirements.txt" -ForegroundColor Yellow
       }
     } catch {
-      Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+      Write-Host "Error during initialization: $($_.Exception.Message)" -ForegroundColor Red
+      Write-Host "Stack trace: $($_.ScriptStackTrace)" -ForegroundColor DarkRed
     }
+
+debug:
+  python:
+    configurations:
+      - name: "Streamlit"
+        type: "python"
+        request: "launch"
+        program: "${workspaceFolder}/venv/Scripts/streamlit.exe"
+        args: 
+          - "run"
+          - "${file}"
+        console: "integratedTerminal"
+        justMyCode: true
+        python: "${workspaceFolder}/venv/Scripts/python.exe"
+        env:
+          PYTHONPATH: "${workspaceFolder}"
+        stopOnEntry: false
+        showReturnValue: true
